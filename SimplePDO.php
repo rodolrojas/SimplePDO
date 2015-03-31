@@ -24,11 +24,12 @@
 				exit($exc->getMessage());
 			}
 			
-			//Forzando a seleccionar DB con una consulta. No se porque cuando conecto no selecciona.
-			try{
-				$this -> conn -> query("USE {$this -> options['database']};");
-			}catch(PDOException $exc){
-				exit($exc->getMessage());
+			if($this -> options['type'] == 'mysql'){
+				try{
+					$this -> conn -> query("USE {$this -> options['database']};");
+				}catch(PDOException $exc){
+					exit($exc->getMessage());
+				}
 			}
 		}
 		public function disconnect(){
