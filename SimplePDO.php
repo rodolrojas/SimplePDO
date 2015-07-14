@@ -4,12 +4,20 @@
 		private $query;
 		private $results;
 		private $options;
+		private $debug;
 		
 		public function SimplePDO($arrOptions){
 			$this -> options = $arrOptions;
 			$this -> checkOptions();
 			$this -> connect();
 		}
+		
+		private function displayError($exception,$query){
+			echo $exception->getMessage();
+			if($this->debug) echo "<pre>".$query."</pre>";
+			exit;
+		}
+		
 		public function connect(){
 			if($this -> options['type'] == 'mysql'){
 				$strCommand = "mysql:host = {$this -> options['host']}; dbname = {$this -> options['database']}";
@@ -21,14 +29,14 @@
 				$this -> conn -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
                 $this -> conn -> setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 			}catch(PDOException $exc){
-				exit($exc->getMessage());
+				$this -> displayError($exc,$strQuery);
 			}
 			
 			if($this -> options['type'] == 'mysql'){
 				try{
 					$this -> conn -> query("USE {$this -> options['database']};");
 				}catch(PDOException $exc){
-					exit($exc->getMessage());
+					$this -> displayError($exc,$strQuery);
 				}
 			}
 		}
@@ -76,6 +84,13 @@
 				}
 			}
 			
+			//Validar si debug activado
+			if(!isset($this -> options['debug'])){
+				$this -> debug = 0;
+			}else{
+				$this -> debug = $this -> options['debug'];
+			}
+			// debug($this);
 			return true;
 		}
 		
@@ -90,7 +105,7 @@
 				$this -> query = $this -> conn -> query($strQuery);
 				$this -> results = $this -> query -> fetch();				
 			}catch(PDOException $exc){
-				exit($exc->getMessage());
+				$this -> displayError($exc,$strQuery);
 			}
 			return $this -> getResults();
 		}
@@ -102,7 +117,7 @@
 				$this -> query = $this -> conn -> query($strQuery);
 				$this -> results = $this -> query -> fetchObject();				
 			}catch(PDOException $exc){
-				exit($exc->getMessage());
+				$this -> displayError($exc,$strQuery);
 			}
 			return $this -> getResults();
 		}
@@ -115,7 +130,7 @@
 				$this -> query = $this -> conn -> query($strQuery);
 				$this -> results = $this -> query -> rowCount();				
 			}catch(PDOException $exc){
-				exit($exc->getMessage());
+				$this -> displayError($exc,$strQuery);
 			}
 			return $this -> getResults();
 		}
@@ -127,7 +142,7 @@
 				$this -> query = $this -> conn -> query($strQuery);
 				$this -> results = $this -> query -> fetchAll();				
 			}catch(PDOException $exc){
-				exit($exc->getMessage());
+				$this -> displayError($exc,$strQuery);
 			}
 			return $this -> getResults();
 		}
@@ -138,7 +153,7 @@
 			try{
 				$this -> query = $this -> conn -> query($strQuery);			
 			}catch(PDOException $exc){
-				exit($exc->getMessage());
+				$this -> displayError($exc,$strQuery);
 			}
 		}
 	}
