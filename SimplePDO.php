@@ -85,10 +85,35 @@
 		
 		public function getSingleRow($strQuery){
 			//Escapamos la query por seguridad
-			$strQuery = addslashes($strQuery);			
+			// $strQuery = addslashes($strQuery);			
 			try{
 				$this -> query = $this -> conn -> query($strQuery);
 				$this -> results = $this -> query -> fetch();				
+			}catch(PDOException $exc){
+				exit($exc->getMessage());
+			}
+			return $this -> getResults();
+		}
+		
+		public function getObject($strQuery){
+			//Escapamos la query por seguridad
+			// $strQuery = addslashes($strQuery);			
+			try{
+				$this -> query = $this -> conn -> query($strQuery);
+				$this -> results = $this -> query -> fetchObject();				
+			}catch(PDOException $exc){
+				exit($exc->getMessage());
+			}
+			return $this -> getResults();
+		}
+		
+		
+		public function countRows($strQuery){
+			//Escapamos la query por seguridad
+			// $strQuery = addslashes($strQuery);			
+			try{
+				$this -> query = $this -> conn -> query($strQuery);
+				$this -> results = $this -> query -> rowCount();				
 			}catch(PDOException $exc){
 				exit($exc->getMessage());
 			}
