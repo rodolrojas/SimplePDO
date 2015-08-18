@@ -12,7 +12,7 @@
 			$this -> connect();
 		}
 		
-		private function displayError($exception,$query){
+		private function displayError($exception,$query = ''){
 			echo $exception->getMessage();
 			if($this->debug) echo "<pre>".$query."</pre>";
 			exit;
@@ -29,14 +29,14 @@
 				$this -> conn -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
                 $this -> conn -> setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 			}catch(PDOException $exc){
-				$this -> displayError($exc,$strQuery);
+				$this -> displayError($exc);
 			}
 			
 			if($this -> options['type'] == 'mysql'){
 				try{
 					$this -> conn -> query("USE {$this -> options['database']};");
 				}catch(PDOException $exc){
-					$this -> displayError($exc,$strQuery);
+					$this -> displayError($exc);
 				}
 			}
 		}
@@ -156,5 +156,92 @@
 				$this -> displayError($exc,$strQuery);
 			}
 		}
+		
+		public function lastInsert(){	
+			try{
+				$data = $this -> conn -> lastInsertId();			
+			}catch(PDOException $exc){
+				$this -> displayError($exc);
+			}
+			return $data;
+		}
 	}
+	
+	class SimpleDB extends SimplePDO{
+		private $query;
+		
+		public function select($fields,$tables,$conditions = "",$group = false,$limit = -1,$offset = -1){
+			$this -> query = "SELECT ";
+			$this -> query .= "$fields ";
+			$this -> query .= "FROM ";
+			$this -> query .= "$tables ";
+			$this -> query .= "WHERE ";
+			if(is_array($conditions)){
+				foreach($conditions as $ind => $val){
+					$this -> query .= $val." ";
+					if($ind+1 < count($conditions)){
+						$this -> query .= "AND ";
+					}
+				}
+			}else{
+				$this -> query .= "$conditions ";
+			}
+			if($group){
+				$this -> query .= "GROUP BY $group ";
+			}
+			if($limit >= 0){
+				if($offset >= 0){
+					$this -> query .= "LIMIT $offset,$limit";
+				}else{
+					$this -> query .= "LIMIT $limit";
+				}
+			}
+		}
+		
+		public function insert($table,$rows){
+			if(is_string($table)){
+				$this -> query = "INSERT INTO TABLE $table ";
+			}else{
+				exit("Error on INSERT constructor: string expected for table name");
+			}
+			
+			if(is_array($rows)){
+				$fields = array_keys($rows);
+				$this -> query .= "(";
+				foreach($fields as $ind => $val){
+					$this -> query .= $val;
+					if($ind+1 < count($fields)){
+						$this -> query .= ", ";
+					}
+				}
+				$this -> query .= ")";
+				
+				$length;
+				
+				foreach($fields as $ind => $val){
+				}
+				
+			}else{
+				exit("Error on INSERT constructor: array expected for values");
+			}
+		}
+		
+		public function update($id,$table,$updates){}
+		
+		public function truncate($table){}
+		
+		public function delete($id,$table){}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 ?>
