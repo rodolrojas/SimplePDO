@@ -20,9 +20,9 @@
 		
 		public function connect(){
 			if($this -> options['type'] == 'mysql'){
-				$strCommand = "mysql:host = {$this -> options['host']}; dbname = {$this -> options['database']}";
+				$strCommand = "mysql:host={$this -> options['host']};dbname={$this -> options['database']}";
 			}elseif($this -> options['type'] == 'pgsql'){
-				$strCommand = "pgsql:host = {$this -> options['host']} port = {$this -> options['port']} dbname = {$this -> options['database']}";
+				$strCommand = "pgsql:host={$this -> options['host']}port={$this -> options['port']} dbname = {$this -> options['database']}";
 			}
 			try{
 				$this -> conn = new PDO($strCommand, $this -> options['user'], $this -> options['pass']);
@@ -232,16 +232,4 @@
 		
 		public function delete($id,$table){}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 ?>
